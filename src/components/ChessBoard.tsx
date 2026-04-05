@@ -20,6 +20,7 @@ interface ChessBoardProps {
   aiLevel?: string;
   onMove?: (fen: string) => void;
   twoPlayer?: boolean;
+  externalFen?: string;
 }
 
 interface CapturedPieces {
@@ -27,9 +28,20 @@ interface CapturedPieces {
   b: string[];
 }
 
-export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, twoPlayer = false }: ChessBoardProps) {
+export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, twoPlayer = false, externalFen }: ChessBoardProps) {
   const [game] = useState(() => new Chess());
   const [fen, setFen] = useState(game.fen());
+
+  // 외부 FEN 동기화 (온라인 멀티)
+  useEffect(() => {
+    if (externalFen && externalFen !== game.fen()) {
+      game.load(externalFen);
+      setFen(externalFen);
+      setSelectedSquare(null);
+      setValidMoves([]);
+      checkGameEnd();
+    }
+  }, [externalFen]); // eslint-disable-line react-hooks/exhaustive-deps
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [validMoves, setValidMoves] = useState<Move[]>([]);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null);
