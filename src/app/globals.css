@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+:root {
+  --bg-gradient-from: #fdf2f8;
+  --bg-gradient-to: #ede9fe;
+  --primary: #8b5cf6;
+  --primary-light: #c4b5fd;
+  --accent: #f472b6;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --square-light: #f3e8ff;
+  --square-dark: #c4b5fd;
+  --square-selected: #a78bfa;
+  --square-valid: rgba(139, 92, 246, 0.4);
+  --square-last-move: rgba(251, 191, 36, 0.35);
+  --square-check: rgba(239, 68, 68, 0.5);
+}
+
+body {
+  background: linear-gradient(135deg, var(--bg-gradient-from), var(--bg-gradient-to));
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: 'Pretendard', sans-serif;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* 체스 보드 */
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border: 3px solid #7c3aed;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
+}
+
+.chess-square {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+  position: relative;
+}
+
+.chess-square.light {
+  background-color: var(--square-light);
+}
+
+.chess-square.dark {
+  background-color: var(--square-dark);
+}
+
+.chess-square.selected {
+  box-shadow: inset 0 0 0 3px #7c3aed;
+  background-color: var(--square-selected) !important;
+}
+
+.chess-square.valid-move::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background-color: var(--square-valid);
+}
+
+.chess-square.valid-capture {
+  box-shadow: inset 0 0 0 3px rgba(139, 92, 246, 0.6);
+}
+
+.chess-square.last-move {
+  background-color: var(--square-last-move) !important;
+}
+
+.chess-square.in-check {
+  background-color: var(--square-check) !important;
+  animation: pulse-check 1s infinite;
+}
+
+@keyframes pulse-check {
+  0%, 100% { box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: inset 0 0 16px rgba(239, 68, 68, 0.7); }
+}
+
+.chess-square:hover {
+  filter: brightness(0.92);
+}
+
+.chess-piece {
+  font-size: clamp(1.5rem, 5vw, 2.8rem);
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+/* 프로모션 다이얼로그 */
+.promotion-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.promotion-dialog {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.promotion-choice {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  border-radius: 12px;
+  border: 2px solid #ede9fe;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: white;
+}
+
+.promotion-choice:hover {
+  background: #f3e8ff;
+  border-color: #8b5cf6;
+  transform: scale(1.1);
+}
+
+/* 카드 */
+.game-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
+  border: 2px solid #ede9fe;
+}
+
+/* 버튼 */
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f472b6, #ec4899);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(244, 114, 182, 0.3);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 114, 182, 0.4);
+}
+
+/* 프로그레스 바 */
+.progress-bar {
+  height: 12px;
+  border-radius: 6px;
+  background: #e9d5ff;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #8b5cf6, #f472b6);
+  transition: width 0.5s ease;
+}
+
+/* 애니메이션 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.4s ease forwards;
+}
+
+/* confetti */
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confetti-fall 3s ease-in forwards;
+  z-index: 1000;
+}
+
+/* 캡처된 기물 */
+.captured-pieces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-height: 28px;
+  font-size: 1.2rem;
+}
+
+/* 무브 히스토리 */
+.move-history {
+  display: grid;
+  grid-template-columns: 30px 1fr 1fr;
+  gap: 2px 8px;
+  font-size: 0.85rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.move-history::-webkit-scrollbar {
+  width: 4px;
+}
+
+.move-history::-webkit-scrollbar-thumb {
+  background: #c4b5fd;
+  border-radius: 2px;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .chess-board {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .chess-square {
+    font-size: 1.5rem;
+  }
+
+  .chess-piece {
+    font-size: clamp(1.2rem, 8vw, 2rem);
+  }
+
+  .game-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .promotion-choice {
+    width: 48px;
+    height: 48px;
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 600px) {
+  .chess-board {
+    max-width: 500px;
+  }
+
+  .chess-piece {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .chess-board {
+    max-width: 560px;
+  }
+
+  .chess-piece {
+    font-size: 3rem;
+  }
+
+  .game-card {
+    padding: 32px;
+  }
+}
