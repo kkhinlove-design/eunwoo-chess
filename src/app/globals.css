@@ -32,7 +32,7 @@ body {
   border-radius: 16px;
   overflow: hidden;
   width: 100%;
-  max-width: 480px;
+  max-width: min(90vw, 560px);
   margin: 0 auto;
   aspect-ratio: 1 / 1;
 }

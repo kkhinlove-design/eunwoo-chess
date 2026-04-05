@@ -125,7 +125,7 @@ export default function PlayPage() {
   return (
     <main className="min-h-screen flex flex-col items-center p-4 pt-6">
       {/* Header */}
-      <div className="w-full max-w-xl flex items-center justify-between mb-4">
+      <div className="w-full max-w-2xl flex flex-wrap items-center justify-between mb-4">
         <button
           onClick={() => {
             setPhase('setup');

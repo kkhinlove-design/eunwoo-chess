@@ -250,7 +250,7 @@ export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, tw
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-xl mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
       {/* Opponent captured pieces */}
       <div className="captured-pieces">
         {(isFlipped ? captured.w : captured.b).map((p, i) => (
