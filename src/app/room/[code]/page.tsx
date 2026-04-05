@@ -35,7 +35,7 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
   // 플레이어 로드
   useEffect(() => {
     if (!playerId) { router.push('/'); return; }
-    supabase.from('chess_players').select('*').eq('id', playerId).single().then(({ data }) => {
+    supabase.from('players').select('*').eq('id', playerId).single().then(({ data }) => {
       if (data) setPlayer(data);
       else router.push('/');
     });
@@ -47,7 +47,7 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
     if (data) {
       const withPlayers = await Promise.all(
         data.map(async (rp) => {
-          const { data: p } = await supabase.from('chess_players').select('*').eq('id', rp.player_id).single();
+          const { data: p } = await supabase.from('players').select('*').eq('id', rp.player_id).single();
           return { ...rp, player: p || undefined };
         })
       );
@@ -168,11 +168,11 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
     // 통계 업데이트
     for (const rp of roomPlayers) {
       const isWinner = rp.player_id === winnerId;
-      const { data: p } = await supabase.from('chess_players').select('games_played, games_won, total_score').eq('id', rp.player_id).single();
+      const { data: p } = await supabase.from('players').select('chess_games_played, chess_games_won, chess_total_score').eq('id', rp.player_id).single();
       if (p) {
-        await supabase.from('chess_players').update({
-          games_played: p.games_played + 1,
-          ...(isWinner ? { games_won: p.games_won + 1, total_score: p.total_score + 100 } : {}),
+        await supabase.from('players').update({
+          chess_games_played: p.chess_games_played + 1,
+          ...(isWinner ? { chess_games_won: p.chess_games_won + 1, chess_total_score: p.chess_total_score + 100 } : {}),
         }).eq('id', rp.player_id);
       }
     }

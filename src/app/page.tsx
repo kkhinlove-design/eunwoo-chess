@@ -10,9 +10,9 @@ interface Player {
   id: string;
   name: string;
   avatar_emoji: string;
-  games_played: number;
-  games_won: number;
-  total_score: number;
+  chess_games_played: number;
+  chess_games_won: number;
+  chess_total_score: number;
 }
 
 export default function Home() {
@@ -27,16 +27,16 @@ export default function Home() {
 
   const loadAllPlayers = async () => {
     const { data } = await supabase
-      .from('chess_players')
+      .from('players')
       .select('*')
-      .order('total_score', { ascending: false });
+      .order('chess_total_score', { ascending: false });
     if (data) setAllPlayers(data);
   };
 
   useEffect(() => {
     const saved = localStorage.getItem('chess_player_id');
     if (saved) {
-      supabase.from('chess_players').select('*').eq('id', saved).single().then(({ data }) => {
+      supabase.from('players').select('*').eq('id', saved).single().then(({ data }) => {
         if (data) setPlayer(data);
       });
     }
@@ -49,19 +49,19 @@ export default function Home() {
     setError('');
     try {
       const { data: existing } = await supabase
-        .from('chess_players')
+        .from('players')
         .select('*')
         .eq('name', name.trim())
         .single();
 
       if (existing) {
-        await supabase.from('chess_players').update({ avatar_emoji: selectedAvatar }).eq('id', existing.id);
+        await supabase.from('players').update({ avatar_emoji: selectedAvatar }).eq('id', existing.id);
         existing.avatar_emoji = selectedAvatar;
         setPlayer(existing);
         localStorage.setItem('chess_player_id', existing.id);
       } else {
         const { data: newPlayer, error: insertErr } = await supabase
-          .from('chess_players')
+          .from('players')
           .insert({ name: name.trim(), avatar_emoji: selectedAvatar })
           .select()
           .single();
@@ -156,7 +156,7 @@ export default function Home() {
                       <div className="flex-1">
                         <span className="font-bold text-purple-700">{p.name}</span>
                         <div className="text-xs text-purple-400">
-                          {p.games_played}게임 | <span className="text-green-500">{p.games_won}승</span> | {p.total_score}점
+                          {p.chess_games_played}게임 | <span className="text-green-500">{p.chess_games_won}승</span> | {p.chess_total_score}점
                         </div>
                       </div>
                     </div>
@@ -179,10 +179,10 @@ export default function Home() {
             <div className="text-5xl mb-2">{player.avatar_emoji}</div>
             <h2 className="text-2xl font-bold text-purple-700">{player.name}</h2>
             <div className="flex justify-center gap-3 mt-2 text-sm text-purple-400">
-              <span>{player.games_played}게임</span>
+              <span>{player.chess_games_played}게임</span>
               <span>|</span>
-              <span className="text-green-500 font-semibold">{player.games_won}승</span>
-              <span className="text-yellow-500 font-bold">{player.total_score}점</span>
+              <span className="text-green-500 font-semibold">{player.chess_games_won}승</span>
+              <span className="text-yellow-500 font-bold">{player.chess_total_score}점</span>
             </div>
           </div>
 
