@@ -164,55 +164,94 @@ export default function ChessPiece3D({ type, color, size = 48 }: ChessPiece3DPro
         </svg>
       );
 
-    // 나이트 - 말 머리
-    case 'n':
+    // 나이트 - 클래식 체스 말
+    case 'n': {
+      const maneColor = isWhite ? '#c2b59b' : '#151515';
+      const maneStroke = isWhite ? '#a89878' : '#000000';
       return (
         <svg {...svgProps}>
           {baseGradient}
+          <defs>
+            <linearGradient id={`${gradId}-face`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={fillLight} />
+              <stop offset="100%" stopColor={fillMid} />
+            </linearGradient>
+          </defs>
+          {/* 받침대 그림자 */}
+          <ellipse cx="24" cy="44" rx="14" ry="2.5" fill={shadow} opacity="0.3" />
           {/* 받침대 */}
-          <ellipse cx="24" cy="43" rx="13" ry="3" fill={shadow} opacity="0.3" />
-          <ellipse cx="24" cy="41" rx="12" ry="3" fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.2" />
-          <rect x="12" y="38" width="24" height="3.5" rx="1" fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.2" />
-          {/* 말 머리+목 전체 실루엣 */}
+          <path d="M10 39 Q10 42 24 43 Q38 42 38 39 L36 37 Q24 38 12 37 Z"
+            fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1" />
+          <path d="M12 37 Q24 38.5 36 37 Q36 35 24 36 Q12 35 12 37 Z"
+            fill={fillLight} stroke={stroke} strokeWidth="0.8" />
+
+          {/* 말 머리+목 메인 실루엣 (클래식 Staunton 스타일) */}
           <path d={[
-            'M17 38',         // 왼쪽 받침대
-            'L15 30',         // 목 왼쪽
-            'Q14 25 15 21',   // 목 커브
-            'L17 17',         // 뒷머리
-            'Q18 13 20 10',   // 이마 커브
-            'L19 7',          // 귀1 시작
-            'Q20 5 22 6',     // 귀1 끝
-            'L21 9',          // 귀 사이
-            'L23 5',          // 귀2 시작
-            'Q25 4 26 6',     // 귀2 끝
-            'L25 9',          // 이마
-            'Q28 10 30 13',   // 얼굴 윗선
-            'Q32 16 33 20',   // 코 라인
-            'L34 24',         // 코끝
-            'Q35 27 33 28',   // 입/턱 커브
-            'L28 27',         // 아래턱
-            'Q27 30 30 33',   // 목 앞쪽
-            'L32 38',         // 오른쪽 받침대
+            'M16 36',
+            'C15 32 13 28 13 24',   // 목 뒤쪽 (S자 커브)
+            'C13 20 15 16 17 13',   // 뒷머리
+            'C18 11 19 9 21 7',     // 정수리
+            'C22 6 24 5.5 25 6',    // 이마 꼭대기
+            'C27 7 29 9 31 12',     // 이마 → 코 연결
+            'C33 15 35 18 36 22',   // 코 (앞으로 쭉)
+            'C36.5 24 36 26 34 27', // 코끝 (둥글게)
+            'C32 28 31 28 30 27',   // 윗입술
+            'C29 26 29 25 30 24',   // 입 안쪽 커브
+            'C30 27 31 30 32 33',   // 턱~목 앞쪽
+            'C33 35 33 36 33 36',   // 목 아래
+            'L33 36',
             'Z',
           ].join(' ')}
-            fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
-          {/* 갈기 (뒷머리~목 따라 지그재그) */}
-          <path d="M17 17 Q14 18 15 21 Q17 19 16 23 Q14 25 15 28 Q17 26 16 30"
-            fill="none" stroke={fillDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-          {/* 눈 */}
-          <ellipse cx="28" cy="15" rx="2.2" ry="2.5" fill={isWhite ? '#ffffff' : '#555'} stroke={stroke} strokeWidth="0.9" />
-          <circle cx="28.8" cy="15" r="1.2" fill={isWhite ? '#2a1f14' : '#111'} />
-          <circle cx="29.3" cy="14.5" r="0.45" fill="#ffffff" opacity="0.9" />
-          {/* 콧구멍 */}
-          <ellipse cx="33" cy="23" rx="1" ry="0.7" fill={fillDark} stroke={stroke} strokeWidth="0.4" />
+            fill={`url(#${gradId}-face)`} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+
+          {/* 갈기 (뒷머리에서 목까지 흐르는 곡선) */}
+          <path d="M17 13 C16 11 18 8 21 7"
+            fill="none" stroke={maneStroke} strokeWidth="2.5" strokeLinecap="round" />
+          <path d={[
+            'M17 13',
+            'C14 14 12 16 13 19',
+            'C14 17 15 15 17 14',
+            'C15 16 13 19 13 22',
+            'C14 20 15 18 16 17',
+            'C14 20 13 23 13 26',
+            'C14 24 15 21 16 20',
+            'C14 24 14 27 14 30',
+            'C15 28 15 25 16 23',
+          ].join(' ')}
+            fill="none" stroke={maneStroke} strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+          {/* 갈기 볼륨 (뒤쪽에 두꺼운 레이어) */}
+          <path d="M17 13 C15 15 13 20 13 26 C13.5 20 15 16 17 14 Z"
+            fill={maneColor} opacity="0.5" />
+
+          {/* 귀 */}
+          <path d="M20 8 L18 4 Q19 3 21 5 Z" fill={`url(#${gradId})`} stroke={stroke} strokeWidth="0.9" />
+          <path d="M19.5 6 L19 4.5" fill="none" stroke={fillDark} strokeWidth="0.5" />
+
+          {/* 눈 (크고 생동감 있게) */}
+          <ellipse cx="27" cy="14" rx="2.5" ry="2.8" fill={isWhite ? '#fff' : '#4a4a4a'} stroke={stroke} strokeWidth="1" />
+          <ellipse cx="27.5" cy="14.2" rx="1.5" ry="1.7" fill={isWhite ? '#2a1510' : '#111'} />
+          <circle cx="28.2" cy="13.5" r="0.6" fill="#fff" opacity="0.9" />
+          {/* 눈썹 라인 */}
+          <path d="M24.5 11.5 Q27 10.5 29.5 11.5" fill="none" stroke={stroke} strokeWidth="0.6" />
+
+          {/* 콧구멍 (둥글고 뚜렷하게) */}
+          <ellipse cx="34.5" cy="25" rx="1.2" ry="1" fill={fillDark} stroke={stroke} strokeWidth="0.5" />
+
           {/* 입 라인 */}
-          <path d="M33 25 Q32 27 28 27" fill="none" stroke={stroke} strokeWidth="0.8" />
-          {/* 얼굴 하이라이트 */}
-          <path d="M25 10 Q29 12 31 16 Q28 13 25 11 Z" fill={highlight} opacity="0.35" />
+          <path d="M34 27 C33 27.5 31 27.5 30 27" fill="none" stroke={stroke} strokeWidth="0.8" />
+
+          {/* 볼 하이라이트 */}
+          <path d="M25 11 C28 10 31 12 33 16 C30 13 27 11 25 11 Z"
+            fill={highlight} opacity="0.3" />
           {/* 목 하이라이트 */}
-          <path d="M20 35 L18 27 Q18 23 20 19 L23 35 Z" fill={`url(#${shineId})`} opacity="0.15" />
+          <path d="M19 34 C18 28 17 24 18 18 L21 18 C20 24 20 28 22 34 Z"
+            fill={highlight} opacity="0.12" />
+          {/* 코 하이라이트 */}
+          <path d="M31 13 C33 16 35 20 35.5 23 C34.5 20 33 16 31 14 Z"
+            fill={highlight} opacity="0.2" />
         </svg>
       );
+    }
 
     // 폰 - 단순한 둥근 머리
     case 'p':
