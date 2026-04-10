@@ -73,6 +73,20 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
       setIsHost(existingRoom.host_id === player.id);
       setHostColor(existingRoom.host_color as 'w' | 'b');
       if (existingRoom.status === 'playing') setGameStarted(true);
+      if (existingRoom.status === 'finished') {
+        setGameStarted(true);
+        setCompleted(true);
+        // 결과 복원
+        if (existingRoom.winner_id) {
+          const { data: rps } = await supabase.from('chess_room_players').select('*').eq('room_id', existingRoom.id);
+          const winnerRp = rps?.find(rp => rp.player_id === existingRoom.winner_id);
+          if (winnerRp) {
+            setGameResult({ winner: winnerRp.color as 'w' | 'b', reason: '게임 종료' });
+          }
+        } else {
+          setGameResult({ winner: 'draw', reason: '무승부' });
+        }
+      }
 
       // 참가자 등록
       if (existingRoom.host_id !== player.id) {
@@ -194,6 +208,15 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
       }
     }
   }, [room, player, roomPlayers]);
+
+  // 기권
+  const handleResign = useCallback(async () => {
+    if (!room || !player || completed) return;
+    if (!confirm('정말 기권하시겠습니까?')) return;
+    const myRp = roomPlayers.find(rp => rp.player_id === player.id);
+    const opponentColor = myRp?.color === 'w' ? 'b' : 'w';
+    handleGameEnd({ winner: opponentColor as 'w' | 'b', reason: '기권' });
+  }, [room, player, completed, roomPlayers, handleGameEnd]);
 
   // 방 코드 복사
   const copyCode = () => {
@@ -364,11 +387,18 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
           onGameEnd={handleGameEnd}
         />
 
-        {/* 내 정보 */}
-        <div className="flex items-center gap-2 mt-2 px-1">
-          <span className="text-lg">{player.avatar_emoji}</span>
-          <span className="text-sm font-bold text-purple-700">{player.name}</span>
-          <span className="text-xs text-purple-400">({myColor === 'w' ? '백' : '흑'})</span>
+        {/* 내 정보 + 기권 */}
+        <div className="flex items-center justify-between mt-2 px-1">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{player.avatar_emoji}</span>
+            <span className="text-sm font-bold text-purple-700">{player.name}</span>
+            <span className="text-xs text-purple-400">({myColor === 'w' ? '백' : '흑'})</span>
+          </div>
+          {!completed && (
+            <button onClick={handleResign} className="px-3 py-1 text-xs font-bold text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-all">
+              🏳️ 기권
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -179,6 +179,23 @@ export default function PlayPage() {
         onGameEnd={handleGameEnd}
       />
 
+      {/* 기권 */}
+      {phase === 'playing' && (
+        <div className="w-full max-w-2xl flex justify-end mt-2">
+          <button
+            onClick={() => {
+              if (confirm('정말 기권하시겠습니까?')) {
+                const aiColor = playerColor === 'w' ? 'b' : 'w';
+                handleGameEnd({ winner: aiColor, reason: '기권' });
+              }
+            }}
+            className="px-3 py-1 text-xs font-bold text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-all"
+          >
+            🏳️ 기권
+          </button>
+        </div>
+      )}
+
       {/* Result overlay */}
       {phase === 'ended' && result && (
         <>

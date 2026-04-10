@@ -115,6 +115,22 @@ export default function LocalPage() {
         onGameEnd={handleGameEnd}
       />
 
+      {/* 무승부 선언 */}
+      {phase === 'playing' && (
+        <div className="w-full max-w-2xl flex justify-end mt-2">
+          <button
+            onClick={() => {
+              if (confirm('무승부로 끝내시겠습니까?')) {
+                handleGameEnd({ winner: 'draw', reason: '합의 무승부' });
+              }
+            }}
+            className="px-3 py-1 text-xs font-bold text-purple-500 bg-purple-50 rounded-lg hover:bg-purple-100 transition-all"
+          >
+            🤝 무승부
+          </button>
+        </div>
+      )}
+
       {/* Result overlay */}
       {phase === 'ended' && result && (
         <>

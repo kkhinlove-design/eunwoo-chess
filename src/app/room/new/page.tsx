@@ -21,17 +21,35 @@ function NewRoomContent() {
 
     const create = async () => {
       const code = generateCode();
-      const { error } = await supabase.from('chess_rooms').insert({
+      const { data: newRoom, error } = await supabase.from('chess_rooms').insert({
         code,
         host_id: playerId,
         status: 'waiting',
         host_color: 'w',
-      });
+      }).select('id').single();
 
-      if (error) { router.push('/'); return; }
+      if (error || !newRoom) {
+        // 코드 중복 등 에러 시 재시도
+        const retryCode = generateCode();
+        const { data: retryRoom, error: retryErr } = await supabase.from('chess_rooms').insert({
+          code: retryCode,
+          host_id: playerId,
+          status: 'waiting',
+          host_color: 'w',
+        }).select('id').single();
+        if (retryErr || !retryRoom) { router.push('/'); return; }
+
+        await supabase.from('chess_room_players').insert({
+          room_id: retryRoom.id,
+          player_id: playerId,
+          color: 'w',
+        });
+        router.replace(`/room/${retryCode}?player=${playerId}`);
+        return;
+      }
 
       await supabase.from('chess_room_players').insert({
-        room_id: (await supabase.from('chess_rooms').select('id').eq('code', code).single()).data?.id,
+        room_id: newRoom.id,
         player_id: playerId,
         color: 'w',
       });
