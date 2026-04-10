@@ -156,7 +156,7 @@ export default function Home() {
                       <div className="flex-1">
                         <span className="font-bold text-purple-700">{p.name}</span>
                         <div className="text-xs text-purple-400">
-                          {p.chess_games_played}게임 | <span className="text-green-500">{p.chess_games_won}승</span> | {p.chess_total_score}점
+                          {p.chess_games_played}게임 | <span className="text-green-500">{p.chess_games_won}승</span> <span className="text-red-400">{p.chess_games_played - p.chess_games_won}패</span> | {p.chess_total_score}점
                         </div>
                       </div>
                     </div>
@@ -182,6 +182,8 @@ export default function Home() {
               <span>{player.chess_games_played}게임</span>
               <span>|</span>
               <span className="text-green-500 font-semibold">{player.chess_games_won}승</span>
+              <span className="text-red-400">{player.chess_games_played - player.chess_games_won}패</span>
+              <span>|</span>
               <span className="text-yellow-500 font-bold">{player.chess_total_score}점</span>
             </div>
           </div>

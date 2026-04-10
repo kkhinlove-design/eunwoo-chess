@@ -151,11 +151,16 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
     await supabase.from('chess_rooms').update({ fen }).eq('id', room.id);
   }, [room]);
 
-  // 게임 종료
+  // 게임 종료 (수를 둔 쪽만 DB 업데이트 → 중복 방지)
+  const statsUpdatedRef = useRef(false);
   const handleGameEnd = useCallback(async (result: { winner: 'w' | 'b' | 'draw'; reason: string }) => {
     setGameResult(result);
     setCompleted(true);
     if (!room || !player) return;
+
+    // 이미 업데이트했으면 스킵
+    if (statsUpdatedRef.current) return;
+    statsUpdatedRef.current = true;
 
     let winnerId: string | null = null;
     if (result.winner !== 'draw') {
@@ -163,16 +168,28 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
       winnerId = winnerRp?.player_id || null;
     }
 
-    await supabase.from('chess_rooms').update({ status: 'finished', winner_id: winnerId }).eq('id', room.id);
+    // status가 아직 playing인 경우에만 업데이트 (한쪽만 성공)
+    const { data: updated } = await supabase
+      .from('chess_rooms')
+      .update({ status: 'finished', winner_id: winnerId })
+      .eq('id', room.id)
+      .eq('status', 'playing')
+      .select()
+      .single();
+
+    // 다른 플레이어가 먼저 처리했으면 스킵
+    if (!updated) return;
 
     // 통계 업데이트
+    const isDraw = result.winner === 'draw';
     for (const rp of roomPlayers) {
       const isWinner = rp.player_id === winnerId;
       const { data: p } = await supabase.from('players').select('chess_games_played, chess_games_won, chess_total_score').eq('id', rp.player_id).single();
       if (p) {
         await supabase.from('players').update({
           chess_games_played: p.chess_games_played + 1,
-          ...(isWinner ? { chess_games_won: p.chess_games_won + 1, chess_total_score: p.chess_total_score + 100 } : {}),
+          chess_games_won: p.chess_games_won + (isWinner ? 1 : 0),
+          chess_total_score: p.chess_total_score + (isWinner ? 100 : isDraw ? 30 : 0),
         }).eq('id', rp.player_id);
       }
     }
@@ -229,7 +246,7 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
           )}
           <div className="flex flex-col gap-2 mt-4">
             {isHost && (
-              <button onClick={() => { setCompleted(false); setGameResult(null); setGameStarted(false); }} className="btn-primary w-full">
+              <button onClick={() => { setCompleted(false); setGameResult(null); setGameStarted(false); statsUpdatedRef.current = false; }} className="btn-primary w-full">
                 다시 하기! 🔄
               </button>
             )}

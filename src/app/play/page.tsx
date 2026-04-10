@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import ChessBoard from '@/components/ChessBoard';
 import Timer from '@/components/Timer';
 import Confetti from '@/components/Confetti';
@@ -23,6 +24,13 @@ export default function PlayPage() {
   const [aiLevel, setAiLevel] = useState('baby');
   const [timerRunning, setTimerRunning] = useState(false);
   const [result, setResult] = useState<{ winner: 'w' | 'b' | 'draw'; reason: string } | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
+
+  // 로그인된 플레이어 ID 로드
+  useEffect(() => {
+    const saved = localStorage.getItem('chess_player_id');
+    if (saved) setPlayerId(saved);
+  }, []);
 
   const startGame = () => {
     setPhase('playing');
@@ -30,11 +38,31 @@ export default function PlayPage() {
     setResult(null);
   };
 
+  // 전적 DB 저장
+  const saveStats = useCallback(async (res: { winner: 'w' | 'b' | 'draw'; reason: string }) => {
+    if (!playerId) return;
+    const { data: p } = await supabase
+      .from('players')
+      .select('chess_games_played, chess_games_won, chess_total_score')
+      .eq('id', playerId)
+      .single();
+    if (!p) return;
+
+    const isWin = res.winner === playerColor;
+    const isDraw = res.winner === 'draw';
+    await supabase.from('players').update({
+      chess_games_played: p.chess_games_played + 1,
+      chess_games_won: p.chess_games_won + (isWin ? 1 : 0),
+      chess_total_score: p.chess_total_score + (isWin ? 100 : isDraw ? 30 : 0),
+    }).eq('id', playerId);
+  }, [playerId, playerColor]);
+
   const handleGameEnd = useCallback((res: { winner: 'w' | 'b' | 'draw'; reason: string }) => {
     setResult(res);
     setPhase('ended');
     setTimerRunning(false);
-  }, []);
+    saveStats(res);
+  }, [saveStats]);
 
   const getResultMessage = () => {
     if (!result) return '';
