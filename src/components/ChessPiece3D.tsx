@@ -173,25 +173,44 @@ export default function ChessPiece3D({ type, color, size = 48 }: ChessPiece3DPro
           <ellipse cx="24" cy="43" rx="13" ry="3" fill={shadow} opacity="0.3" />
           <ellipse cx="24" cy="41" rx="12" ry="3" fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.2" />
           <rect x="12" y="38" width="24" height="3.5" rx="1" fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.2" />
-          {/* 목 */}
-          <path d="M16 38 L14 28 Q13 22 16 18 L20 14 Q22 12 22 10 L24 8 Q28 7 30 10 Q33 14 34 18 Q35 22 33 26 L32 38 Z"
-            fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
-          {/* 갈기 */}
-          <path d="M20 14 Q18 16 16 18 Q18 15 20 14 Z" fill={fillDark} stroke={stroke} strokeWidth="0.5" />
-          <path d="M18 18 Q16 22 14 28 Q17 23 19 19 Z" fill={fillDark} opacity="0.5" />
-          {/* 귀 */}
-          <path d="M22 10 L20 6 L24 8 Z" fill={`url(#${gradId})`} stroke={stroke} strokeWidth="0.8" />
+          {/* 말 머리+목 전체 실루엣 */}
+          <path d={[
+            'M17 38',         // 왼쪽 받침대
+            'L15 30',         // 목 왼쪽
+            'Q14 25 15 21',   // 목 커브
+            'L17 17',         // 뒷머리
+            'Q18 13 20 10',   // 이마 커브
+            'L19 7',          // 귀1 시작
+            'Q20 5 22 6',     // 귀1 끝
+            'L21 9',          // 귀 사이
+            'L23 5',          // 귀2 시작
+            'Q25 4 26 6',     // 귀2 끝
+            'L25 9',          // 이마
+            'Q28 10 30 13',   // 얼굴 윗선
+            'Q32 16 33 20',   // 코 라인
+            'L34 24',         // 코끝
+            'Q35 27 33 28',   // 입/턱 커브
+            'L28 27',         // 아래턱
+            'Q27 30 30 33',   // 목 앞쪽
+            'L32 38',         // 오른쪽 받침대
+            'Z',
+          ].join(' ')}
+            fill={`url(#${gradId})`} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          {/* 갈기 (뒷머리~목 따라 지그재그) */}
+          <path d="M17 17 Q14 18 15 21 Q17 19 16 23 Q14 25 15 28 Q17 26 16 30"
+            fill="none" stroke={fillDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
           {/* 눈 */}
-          <circle cx="28" cy="13" r="2" fill={isWhite ? '#ffffff' : '#555'} stroke={stroke} strokeWidth="0.8" />
-          <circle cx="28.5" cy="13" r="1" fill={isWhite ? '#2a1f14' : '#111'} />
-          <circle cx="29" cy="12.5" r="0.4" fill="#ffffff" opacity="0.8" />
+          <ellipse cx="28" cy="15" rx="2.2" ry="2.5" fill={isWhite ? '#ffffff' : '#555'} stroke={stroke} strokeWidth="0.9" />
+          <circle cx="28.8" cy="15" r="1.2" fill={isWhite ? '#2a1f14' : '#111'} />
+          <circle cx="29.3" cy="14.5" r="0.45" fill="#ffffff" opacity="0.9" />
           {/* 콧구멍 */}
-          <circle cx="31" cy="18" r="0.8" fill={fillDark} />
-          {/* 입 */}
-          <path d="M29 19 Q32 20 33 18" fill="none" stroke={stroke} strokeWidth="0.7" />
-          {/* 하이라이트 */}
-          <path d="M26 10 Q30 10 32 14 Q29 11 26 10 Z" fill={highlight} opacity="0.4" />
-          <path d="M18 35 L17 28 Q18 24 20 20 L22 35 Z" fill={`url(#${shineId})`} opacity="0.15" />
+          <ellipse cx="33" cy="23" rx="1" ry="0.7" fill={fillDark} stroke={stroke} strokeWidth="0.4" />
+          {/* 입 라인 */}
+          <path d="M33 25 Q32 27 28 27" fill="none" stroke={stroke} strokeWidth="0.8" />
+          {/* 얼굴 하이라이트 */}
+          <path d="M25 10 Q29 12 31 16 Q28 13 25 11 Z" fill={highlight} opacity="0.35" />
+          {/* 목 하이라이트 */}
+          <path d="M20 35 L18 27 Q18 23 20 19 L23 35 Z" fill={`url(#${shineId})`} opacity="0.15" />
         </svg>
       );
 
