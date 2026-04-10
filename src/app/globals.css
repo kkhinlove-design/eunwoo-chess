@@ -100,6 +100,20 @@ body {
   pointer-events: none;
 }
 
+.chess-piece-3d {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  height: 80%;
+}
+
+.chess-piece-3d svg {
+  width: 100%;
+  height: 100%;
+}
+
 /* 프로모션 다이얼로그 */
 .promotion-overlay {
   position: fixed;

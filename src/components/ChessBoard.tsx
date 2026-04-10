@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chess, Square, Move } from 'chess.js';
 import { getAIMove } from '@/lib/chess-ai';
+import ChessPiece3D from './ChessPiece3D';
 
 const PIECE_UNICODE: Record<string, Record<string, string>> = {
   w: { k: '\u2654', q: '\u2655', r: '\u2656', b: '\u2657', n: '\u2658', p: '\u2659' },
@@ -224,8 +225,8 @@ export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, tw
         onClick={() => handleSquareClick(square)}
       >
         {piece && (
-          <span className="chess-piece">
-            {PIECE_UNICODE[piece.color][piece.type]}
+          <span className="chess-piece-3d">
+            <ChessPiece3D type={piece.type} color={piece.color} />
           </span>
         )}
         {/* File labels on bottom row */}
@@ -328,7 +329,7 @@ export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, tw
                 className="promotion-choice"
                 onClick={() => handlePromotion(p)}
               >
-                {PIECE_UNICODE[game.turn()][p]}
+                <ChessPiece3D type={p} color={game.turn()} size={40} />
               </button>
             ))}
           </div>
