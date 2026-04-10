@@ -21,6 +21,7 @@ interface ChessBoardProps {
   onMove?: (fen: string) => void;
   twoPlayer?: boolean;
   externalFen?: string;
+  forceGameOver?: boolean;
 }
 
 interface CapturedPieces {
@@ -28,9 +29,14 @@ interface CapturedPieces {
   b: string[];
 }
 
-export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, twoPlayer = false, externalFen }: ChessBoardProps) {
+export default function ChessBoard({ playerColor, onGameEnd, aiLevel, onMove, twoPlayer = false, externalFen, forceGameOver = false }: ChessBoardProps) {
   const [game] = useState(() => new Chess());
   const [fen, setFen] = useState(game.fen());
+
+  // 외부에서 게임 종료 강제 (기권 등)
+  useEffect(() => {
+    if (forceGameOver) setGameOver(true);
+  }, [forceGameOver]);
 
   // 외부 FEN 동기화 (온라인 멀티)
   useEffect(() => {

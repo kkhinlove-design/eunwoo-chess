@@ -116,7 +116,13 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
         (payload) => {
           const updated = payload.new as Room;
           setRoom(updated);
-          if (updated.status === 'playing') setGameStarted(true);
+          if (updated.status === 'playing') {
+            setGameStarted(true);
+            // 다시 하기 시 게스트 측 결과 화면 리셋
+            setCompleted(false);
+            setGameResult(null);
+            statsUpdatedRef.current = false;
+          }
           if (updated.status === 'finished') {
             setCompleted(true);
             loadPlayers(rId);
@@ -129,7 +135,15 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
       const { data } = await supabase.from('chess_rooms').select('*').eq('id', rId).single();
       if (data) {
         setRoom(data);
-        if (data.status === 'playing') setGameStarted(true);
+        if (data.status === 'playing') {
+          setGameStarted(true);
+          setCompleted(false);
+          setGameResult(null);
+          statsUpdatedRef.current = false;
+        }
+        if (data.status === 'finished') {
+          setCompleted(true);
+        }
       }
       loadPlayers(rId);
     }, 2000);
@@ -385,6 +399,7 @@ function RoomContent({ params }: { params: Promise<{ code: string }> }) {
           externalFen={room.fen}
           onMove={handleMove}
           onGameEnd={handleGameEnd}
+          forceGameOver={completed}
         />
 
         {/* 내 정보 + 기권 */}

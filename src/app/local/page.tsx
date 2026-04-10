@@ -113,6 +113,7 @@ export default function LocalPage() {
         playerColor="w"
         twoPlayer={true}
         onGameEnd={handleGameEnd}
+        forceGameOver={phase === 'ended'}
       />
 
       {/* 무승부 선언 */}

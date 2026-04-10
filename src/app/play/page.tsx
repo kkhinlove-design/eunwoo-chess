@@ -177,6 +177,7 @@ export default function PlayPage() {
         playerColor={playerColor}
         aiLevel={aiLevel}
         onGameEnd={handleGameEnd}
+        forceGameOver={phase === 'ended'}
       />
 
       {/* 기권 */}
